@@ -1,0 +1,5 @@
+{
+  "navigationBarTitleText": "实时行情",
+  "enablePullDownRefresh": true,
+  "backgroundColor": "#1a1a1a"
+}

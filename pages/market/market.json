@@ -1,0 +1,7 @@
+{
+  "navigationBarTitleText": "ZAN GOLD",
+  "enablePullDownRefresh": true,
+  "usingComponents": {
+    "price-chart": "/components/price-chart/price-chart"
+  }
+}

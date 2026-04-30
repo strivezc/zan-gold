@@ -1,0 +1,118 @@
+<view class="container {{isDark ? 'dark' : ''}}">
+  <!-- 主题设置 -->
+  <view class="section">
+    <text class="section-title">外观</text>
+    <view class="theme-picker">
+      <view class="theme-option {{themeMode === 'system' ? 'active' : ''}}" data-mode="system" bindtap="onThemeChange">
+        <text class="theme-icon">🔄</text>
+        <text class="theme-label">跟随系统</text>
+      </view>
+      <view class="theme-option {{themeMode === 'light' ? 'active' : ''}}" data-mode="light" bindtap="onThemeChange">
+        <text class="theme-icon">☀</text>
+        <text class="theme-label">浅色</text>
+      </view>
+      <view class="theme-option {{themeMode === 'dark' ? 'active' : ''}}" data-mode="dark" bindtap="onThemeChange">
+        <text class="theme-icon">🌙</text>
+        <text class="theme-label">深色</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 价格预警 -->
+  <view class="section">
+    <view class="section-header">
+      <text class="section-title">价格预警</text>
+      <view class="add-btn" bindtap="onShowAlertSheet">
+        <text>添加</text>
+      </view>
+    </view>
+
+    <view class="alert-item" wx:for="{{alerts}}" wx:key="id">
+      <view class="alert-info">
+        <text class="alert-metal">{{metalNames[item.metal]}}</text>
+        <text class="alert-condition">
+          {{item.condition === 'above' ? '高于' : '低于'}} ¥{{item.targetPrice}}/g
+        </text>
+      </view>
+      <view class="alert-actions">
+        <switch class="alert-switch" checked="{{item.enabled}}" data-id="{{item.id}}" bindchange="onToggleAlert" color="#ff9500" />
+        <view class="alert-delete" data-id="{{item.id}}" bindtap="onDeleteAlert">
+          <text>删除</text>
+        </view>
+      </view>
+    </view>
+
+    <view class="empty-alerts" wx:if="{{alerts.length === 0}}">
+      <text class="empty-text">暂无预警</text>
+      <text class="empty-hint">添加价格预警，在价格到达目标时收到通知</text>
+    </view>
+  </view>
+
+  <!-- 数据管理 -->
+  <view class="section">
+    <text class="section-title">数据</text>
+    <view class="setting-item" bindtap="onClearHistory">
+      <view class="item-left">
+        <text class="item-icon">📊</text>
+        <view class="item-info">
+          <text class="item-title">清除价格历史</text>
+          <text class="item-desc">已记录 {{historyDataSize}} 数据</text>
+        </view>
+      </view>
+      <text class="item-arrow">›</text>
+    </view>
+    <view class="setting-item danger" bindtap="onClearAll">
+      <view class="item-left">
+        <text class="item-icon">🗑</text>
+        <view class="item-info">
+          <text class="item-title">清除所有数据</text>
+          <text class="item-desc">持仓、交易记录、价格历史全部清除</text>
+        </view>
+      </view>
+      <text class="item-arrow">›</text>
+    </view>
+  </view>
+
+  <!-- 关于 -->
+  <view class="section">
+    <text class="section-title">关于</text>
+    <view class="setting-item" bindtap="onAbout">
+      <view class="item-left">
+        <text class="item-icon">💛</text>
+        <view class="item-info">
+          <text class="item-title">关于 ZAN GOLD</text>
+          <text class="item-desc">Version 2.0</text>
+        </view>
+      </view>
+      <text class="item-arrow">›</text>
+    </view>
+  </view>
+
+  <!-- 添加预警Sheet -->
+  <view class="sheet-mask {{showAlertSheet ? 'show' : ''}}" bindtap="onHideAlertSheet"></view>
+  <view class="sheet {{showAlertSheet ? 'show' : ''}}">
+    <view class="sheet-header">
+      <text class="sheet-title">添加价格预警</text>
+      <text class="sheet-close" bindtap="onHideAlertSheet">取消</text>
+    </view>
+    <view class="form-group">
+      <view class="form-row">
+        <text class="form-label">金属类型</text>
+        <picker range="{{['黄金', '白银', '铂金', '钯金']}}" bindchange="onAlertMetalChange">
+          <text class="form-value">{{metalNames[alertMetal]}} ▾</text>
+        </picker>
+      </view>
+      <view class="form-row">
+        <text class="form-label">触发条件</text>
+        <picker range="{{['高于', '低于']}}" bindchange="onAlertConditionChange">
+          <text class="form-value">{{alertCondition === 'above' ? '高于' : '低于'}} ▾</text>
+        </picker>
+      </view>
+      <view class="form-row">
+        <text class="form-label">目标价格 (元/g)</text>
+        <input class="form-input" type="digit" value="{{alertPrice}}" bindinput="onAlertPriceInput" placeholder="输入目标价格" />
+      </view>
+    </view>
+    <view class="sheet-btn" bindtap="onConfirmAlert">保存预警</view>
+  </view>
+</view>

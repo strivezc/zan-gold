@@ -1,0 +1,160 @@
+<view class="container {{isDark ? 'dark' : ''}}">
+  <!-- 汇总卡片 -->
+  <view class="summary-cards" wx:if="{{summary}}">
+    <view class="sum-card gold-bg">
+      <text class="sum-label">Au 黄金</text>
+      <text class="sum-value">¥{{summary.gold.totalValue ? summary.gold.totalValue.toFixed(2) : '0.00'}}</text>
+      <view class="sum-meta">
+        <text>{{summary.gold.weight.toFixed(2)}}g</text>
+        <text class="sum-pnl {{summary.gold.pnl >= 0 ? 'up' : 'down'}}">
+          {{summary.gold.pnl >= 0 ? '+' : ''}}{{summary.gold.pnlRate.toFixed(2)}}%
+        </text>
+      </view>
+    </view>
+    <view class="sum-card silver-bg">
+      <text class="sum-label">Ag 白银</text>
+      <text class="sum-value">¥{{summary.silver.totalValue ? summary.silver.totalValue.toFixed(2) : '0.00'}}</text>
+      <view class="sum-meta">
+        <text>{{summary.silver.weight.toFixed(2)}}g</text>
+        <text class="sum-pnl {{summary.silver.pnl >= 0 ? 'up' : 'down'}}">
+          {{summary.silver.pnl >= 0 ? '+' : ''}}{{summary.silver.pnlRate.toFixed(2)}}%
+        </text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 铂金/钯金汇总(有持仓时显示) -->
+  <view class="summary-cards secondary" wx:if="{{summary.platinum.weight > 0 || summary.palladium.weight > 0}}">
+    <view class="sum-card platinum-bg" wx:if="{{summary.platinum.weight > 0}}">
+      <text class="sum-label">Pt 铂金</text>
+      <text class="sum-value">¥{{summary.platinum.totalValue.toFixed(2)}}</text>
+      <view class="sum-meta">
+        <text>{{summary.platinum.weight.toFixed(2)}}g</text>
+        <text class="sum-pnl {{summary.platinum.pnl >= 0 ? 'up' : 'down'}}">
+          {{summary.platinum.pnl >= 0 ? '+' : ''}}{{summary.platinum.pnlRate.toFixed(2)}}%
+        </text>
+      </view>
+    </view>
+    <view class="sum-card palladium-bg" wx:if="{{summary.palladium.weight > 0}}">
+      <text class="sum-label">Pd 钯金</text>
+      <text class="sum-value">¥{{summary.palladium.totalValue.toFixed(2)}}</text>
+      <view class="sum-meta">
+        <text>{{summary.palladium.weight.toFixed(2)}}g</text>
+        <text class="sum-pnl {{summary.palladium.pnl >= 0 ? 'up' : 'down'}}">
+          {{summary.palladium.pnl >= 0 ? '+' : ''}}{{summary.palladium.pnlRate.toFixed(2)}}%
+        </text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 总计 -->
+  <view class="grand-total" wx:if="{{summary}}">
+    <text class="gt-label">资产总净值</text>
+    <text class="gt-value">¥{{summary.grandTotal.toFixed(2)}}</text>
+    <view class="gt-pnl {{summary.totalPnl >= 0 ? 'up' : 'down'}}" wx:if="{{positions.length > 0}}">
+      <text>{{summary.totalPnl >= 0 ? '▲' : '▼'}}</text>
+      <text> 累计盈亏: {{summary.totalPnl >= 0 ? '+' : ''}}{{summary.totalPnl.toFixed(2)}} 元</text>
+    </view>
+    <view class="share-btn" bindtap="onSharePortfolio">
+      <text>分享持仓</text>
+    </view>
+  </view>
+
+  <!-- 持仓列表 -->
+  <view class="section-title">
+    <text>持仓明细</text>
+    <text class="pos-count">共 {{positions.length}} 笔</text>
+  </view>
+
+  <view class="position-list">
+    <view class="pos-item" wx:for="{{positions}}" wx:key="id">
+      <view class="pos-left">
+        <view class="pos-icon {{item.metal}}-icon">{{metalIcons[item.metal]}}</view>
+      </view>
+      <view class="pos-center">
+        <text class="pos-metal">{{metalNames[item.metal]}}</text>
+        <text class="pos-detail">{{item.weight}}g · 均价 ¥{{item.pricePerGram ? item.pricePerGram.toFixed(2) : '--'}}</text>
+        <text class="pos-date">{{item.date}}{{item.note ? ' · ' + item.note : ''}}</text>
+      </view>
+      <view class="pos-actions">
+        <view class="pos-action sell" bindtap="onShowSellSheet" data-metal="{{item.metal}}">
+          <text>卖出</text>
+        </view>
+        <view class="pos-action delete" bindtap="onDeletePosition" data-id="{{item.id}}">
+          <text>删除</text>
+        </view>
+      </view>
+    </view>
+
+    <view class="empty-state" wx:if="{{positions.length === 0}}">
+      <text class="empty-icon">📊</text>
+      <text class="empty-text">暂无持仓记录</text>
+      <text class="empty-hint">点击下方按钮添加你的第一笔持仓</text>
+    </view>
+  </view>
+
+  <!-- 浮动添加按钮 -->
+  <view class="fab" bindtap="onShowAddSheet">
+    <text class="fab-icon">+</text>
+  </view>
+
+  <!-- 添加持仓底Sheet -->
+  <view class="sheet-mask {{showAddSheet ? 'show' : ''}}" bindtap="onHideAddSheet"></view>
+  <view class="sheet {{showAddSheet ? 'show' : ''}}">
+    <view class="sheet-header">
+      <text class="sheet-title">买入建仓</text>
+      <text class="sheet-close" bindtap="onHideAddSheet">取消</text>
+    </view>
+    <view class="form-group">
+      <view class="form-row">
+        <text class="form-label">金属类型</text>
+        <picker range="{{['黄金', '白银', '铂金', '钯金']}}" bindchange="onMetalChange">
+          <text class="form-value">{{metalNames[newMetal]}} ▾</text>
+        </picker>
+      </view>
+      <view class="form-row">
+        <text class="form-label">买入日期</text>
+        <picker mode="date" value="{{newDate}}" bindchange="onDateChange">
+          <text class="form-value">{{newDate}} ▾</text>
+        </picker>
+      </view>
+      <view class="form-row">
+        <text class="form-label">买入均价 (元/g)</text>
+        <input class="form-input" type="digit" value="{{newPrice}}" bindinput="onNewPriceInput" placeholder="输入买入价格" />
+      </view>
+      <view class="form-row">
+        <text class="form-label">持有克数</text>
+        <input class="form-input" type="digit" value="{{newWeight}}" bindinput="onNewWeightInput" placeholder="输入克数" />
+      </view>
+      <view class="form-row">
+        <text class="form-label">备注 (可选)</text>
+        <input class="form-input" value="{{newNote}}" bindinput="onNewNoteInput" placeholder="如: 春节购入" />
+      </view>
+    </view>
+    <view class="sheet-btn" bindtap="onConfirmAdd">确认买入</view>
+  </view>
+
+  <!-- 卖出底Sheet -->
+  <view class="sheet-mask {{showSellSheet ? 'show' : ''}}" bindtap="onHideSellSheet"></view>
+  <view class="sheet {{showSellSheet ? 'show' : ''}}">
+    <view class="sheet-header">
+      <text class="sheet-title">卖出{{metalNames[sellMetal]}}</text>
+      <text class="sheet-close" bindtap="onHideSellSheet">取消</text>
+    </view>
+    <view class="form-group">
+      <view class="form-row">
+        <text class="form-label">可卖克数</text>
+        <text class="form-value">{{sellAvailable.toFixed(2)}}g</text>
+      </view>
+      <view class="form-row">
+        <text class="form-label">卖出克数</text>
+        <input class="form-input" type="digit" value="{{sellWeight}}" bindinput="onSellWeightInput" placeholder="输入卖出克数" />
+      </view>
+      <view class="form-row">
+        <text class="form-label">卖出价格 (元/g)</text>
+        <input class="form-input" type="digit" value="{{sellPrice}}" bindinput="onSellPriceInput" placeholder="输入卖出价格" />
+      </view>
+    </view>
+    <view class="sheet-btn sell-btn" bindtap="onConfirmSell">确认卖出</view>
+  </view>
+</view>

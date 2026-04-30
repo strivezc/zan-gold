@@ -1,0 +1,25 @@
+{
+  "pages": [
+    "pages/market/market",
+    "pages/portfolio/portfolio",
+    "pages/history/history",
+    "pages/settings/settings"
+  ],
+  "window": {
+    "backgroundTextStyle": "dark",
+    "navigationBarBackgroundColor": "#ffffff",
+    "navigationBarTitleText": "ZAN GOLD",
+    "navigationBarTextStyle": "black",
+    "backgroundColor": "#F5F6F8"
+  },
+  "tabBar": {
+    "custom": true,
+    "list": [
+      { "pagePath": "pages/market/market", "text": "行情" },
+      { "pagePath": "pages/portfolio/portfolio", "text": "持仓" },
+      { "pagePath": "pages/history/history", "text": "历史" },
+      { "pagePath": "pages/settings/settings", "text": "设置" }
+    ]
+  },
+  "sitemapLocation": "sitemap.json"
+}

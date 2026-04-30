@@ -1,0 +1,81 @@
+<view class="container {{isDark ? 'dark' : ''}}">
+  <!-- Header -->
+  <view class="header">
+    <view class="brand">
+      <view class="gold-bar-logo"></view>
+      <text class="brand-name">ZAN GOLD</text>
+    </view>
+    <view class="manual-refresh {{loading ? 'rotating' : ''}}" bindtap="refreshPrices">
+      <text class="refresh-icon">↻</text>
+      <text class="refresh-label">手动同步</text>
+    </view>
+  </view>
+
+  <!-- 行情卡片 -->
+  <view class="market-view">
+    <view class="m-card gold gold-card-wrap" wx:if="{{prices.gold}}">
+      <view class="m-title">国际现货金</view>
+      <view class="m-price-row">
+        <text class="m-price-g">{{displayGoldPrice}}</text>
+        <text class="unit">元/g</text>
+      </view>
+      <view class="m-sub-info">
+        <text class="oz-live">${{prices.gold.price_oz}}/oz</text>
+        <view class="trend {{prices.gold.change >= 0 ? 'up' : 'down'}}">{{prices.gold.percent}}</view>
+      </view>
+    </view>
+
+    <view class="m-card silver silver-card-wrap" wx:if="{{prices.silver}}">
+      <view class="m-title">国际现货银</view>
+      <view class="m-price-row">
+        <text class="m-price-g">{{displaySilverPrice}}</text>
+        <text class="unit">元/g</text>
+      </view>
+      <view class="m-sub-info">
+        <text class="oz-live">${{prices.silver.price_oz}}/oz</text>
+        <view class="trend {{prices.silver.change >= 0 ? 'up' : 'down'}}">{{prices.silver.percent}}</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 金银比 -->
+  <view class="ratio-bar" wx:if="{{goldSilverRatio !== '--'}}">
+    <text class="ratio-label">金银比</text>
+    <text class="ratio-value">{{goldSilverRatio}}</text>
+  </view>
+
+  <!-- 价格走势图 -->
+  <price-chart metal="gold" />
+
+  <!-- 同步提示 -->
+  <view class="sync-hint-container">
+    <text class="sync-hint">每30秒自动刷新 · 上次同步 {{lastUpdate}}</text>
+  </view>
+
+  <!-- 国际金价换算 -->
+  <view class="converter-pane">
+    <view class="converter-title-row">
+      <text class="converter-title">国际金价换算</text>
+      <view class="live-rate-action" bindtap="onUseLiveRate" wx:if="{{prices.exchangeRate}}">
+        使用实时汇率
+      </view>
+    </view>
+
+    <view class="input-group converter-input-group">
+      <view class="input-cell">
+        <text class="label">国际金价(美元/盎司)</text>
+        <input class="cell-input" type="digit" value="{{intlGoldOzInput}}" bindinput="onIntlGoldOzInput" placeholder="例如 3035.20" />
+      </view>
+      <view class="divider"></view>
+      <view class="input-cell">
+        <text class="label">汇率(USD/CNY)</text>
+        <input class="cell-input" type="digit" value="{{domesticRateInput}}" bindinput="onDomesticRateInput" placeholder="例如 7.23" />
+      </view>
+    </view>
+
+    <view class="converter-result-row" bindtap="onTapConverter">
+      <text class="converter-result-label">国内参考金价</text>
+      <text class="converter-result-value">{{domesticGoldResult}} 元/克</text>
+    </view>
+  </view>
+</view>

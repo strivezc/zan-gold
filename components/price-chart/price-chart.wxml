@@ -1,0 +1,18 @@
+<view class="chart-container">
+  <view class="chart-tabs">
+    <view class="tab {{range === '1d' ? 'active' : ''}}" data-range="1d" bindtap="onRangeChange">日</view>
+    <view class="tab {{range === '1w' ? 'active' : ''}}" data-range="1w" bindtap="onRangeChange">周</view>
+    <view class="tab {{range === '1m' ? 'active' : ''}}" data-range="1m" bindtap="onRangeChange">月</view>
+  </view>
+  <view class="chart-area">
+    <canvas type="2d" id="chartCanvas" class="chart-canvas"
+      bindtouchstart="onTouchStart"
+      bindtouchmove="onTouchMove"
+      bindtouchend="onTouchEnd">
+    </canvas>
+    <view class="chart-info" wx:if="{{touchValue}}">
+      <text class="chart-time">{{touchValue.time}}</text>
+      <text class="chart-price">¥{{touchValue.price}}/g</text>
+    </view>
+  </view>
+</view>

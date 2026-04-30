@@ -1,0 +1,39 @@
+<view class="container {{isDark ? 'dark' : ''}}">
+  <!-- 已实现盈亏汇总 -->
+  <view class="pnl-banner {{totalRealizedPnl >= 0 ? 'up' : 'down'}}">
+    <text class="pnl-label">累计已实现盈亏</text>
+    <text class="pnl-amount">{{totalRealizedPnl >= 0 ? '+' : ''}}{{totalRealizedPnl.toFixed(2)}} 元</text>
+  </view>
+
+  <!-- 筛选 -->
+  <view class="filter-bar">
+    <view class="chip {{filter === 'all' ? 'active' : ''}}" data-filter="all" bindtap="onFilterChange">全部</view>
+    <view class="chip {{filter === 'buy' ? 'active' : ''}}" data-filter="buy" bindtap="onFilterChange">买入</view>
+    <view class="chip {{filter === 'sell' ? 'active' : ''}}" data-filter="sell" bindtap="onFilterChange">卖出</view>
+  </view>
+
+  <!-- 交易列表 -->
+  <view class="tx-list">
+    <view class="tx-item" wx:for="{{filteredTransactions}}" wx:key="id">
+      <view class="tx-type {{item.type}}">
+        <text>{{item.type === 'buy' ? '买' : '卖'}}</text>
+      </view>
+      <view class="tx-info">
+        <text class="tx-metal">{{item.metal === 'gold' ? '黄金' : item.metal === 'silver' ? '白银' : item.metal === 'platinum' ? '铂金' : '钯金'}}</text>
+        <text class="tx-detail">{{item.weight}}g · ¥{{item.pricePerGram ? item.pricePerGram.toFixed(2) : '--'}}/g</text>
+        <text class="tx-date">{{item.date}}{{item.note ? ' · ' + item.note : ''}}</text>
+      </view>
+      <view class="tx-pnl" wx:if="{{item.type === 'sell' && item.realizedPnl !== null}}">
+        <text class="{{item.realizedPnl >= 0 ? 'up' : 'down'}}">
+          {{item.realizedPnl >= 0 ? '+' : ''}}{{item.realizedPnl.toFixed(2)}}
+        </text>
+      </view>
+    </view>
+
+    <view class="empty-state" wx:if="{{filteredTransactions.length === 0}}">
+      <text class="empty-icon">📋</text>
+      <text class="empty-text">暂无交易记录</text>
+      <text class="empty-hint">在持仓页添加买入或卖出操作后，记录将显示在这里</text>
+    </view>
+  </view>
+</view>
