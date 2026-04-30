@@ -1,10 +1,22 @@
-import { getSettings, saveSettings, getAlerts, addAlert, deleteAlert, updateAlert } from "../../utils/storage";
+import {
+  getSettings,
+  saveSettings,
+  getAlerts,
+  addAlert,
+  deleteAlert,
+  updateAlert,
+} from "../../utils/storage";
 import { clearHistory } from "../../utils/priceHistory";
 import { createAlert, requestAlertPermission } from "../../utils/alertService";
 
 const app = getApp();
 
-const METAL_NAMES = { gold: "黄金", silver: "白银", platinum: "铂金", palladium: "钯金" };
+const METAL_NAMES = {
+  gold: "黄金",
+  silver: "白银",
+  platinum: "铂金",
+  palladium: "钯金",
+};
 
 Page({
   data: {
@@ -35,7 +47,20 @@ Page({
   },
 
   _loadAlerts() {
-    this.setData({ alerts: getAlerts() });
+    const raw = getAlerts();
+    const formatted = raw.map((a) => {
+      let _status = "待触发";
+      if (a.lastTriggeredAt) {
+        const d = new Date(a.lastTriggeredAt);
+        const mm = String(d.getMonth() + 1).padStart(2, "0");
+        const dd = String(d.getDate()).padStart(2, "0");
+        const hh = String(d.getHours()).padStart(2, "0");
+        const mi = String(d.getMinutes()).padStart(2, "0");
+        _status = `已触发 ${mm}-${dd} ${hh}:${mi}`;
+      }
+      return { ...a, _status };
+    });
+    this.setData({ alerts: formatted });
   },
 
   _calcHistorySize() {
@@ -85,7 +110,9 @@ Page({
   },
 
   onAlertConditionChange(e) {
-    this.setData({ alertCondition: e.detail.value === "0" ? "above" : "below" });
+    this.setData({
+      alertCondition: e.detail.value === "0" ? "above" : "below",
+    });
   },
 
   onAlertPriceInput(e) {
@@ -101,13 +128,37 @@ Page({
       return;
     }
 
-    // 请求通知权限
-    const granted = await requestAlertPermission();
-    if (!granted) {
-      wx.showToast({ title: "需要通知权限才能发送提醒", icon: "none" });
+    // 已有预警时提示
+    const existing = getAlerts();
+    if (existing.length > 0) {
+      const cont = await new Promise((resolve) => {
+        wx.showModal({
+          title: "替换预警",
+          content: "已有预警将被删除，微信每次只能授权一条通知推送。确定替换？",
+          confirmText: "替换",
+          cancelText: "取消",
+          success: (res) => resolve(res.confirm),
+        });
+      });
+      if (!cont) return;
+      existing.forEach((a) => deleteAlert(a.id));
     }
 
-    const alert = createAlert({ metal: alertMetal, condition: alertCondition, targetPrice: price });
+    // 添加时请求一次性订阅权限(用户点击触发，可弹授权窗)
+    const granted = await requestAlertPermission();
+    if (!granted) {
+      wx.showToast({
+        title: "未授权通知，预警仅在小程序内提示",
+        icon: "none",
+        duration: 2000,
+      });
+    }
+
+    const alert = createAlert({
+      metal: alertMetal,
+      condition: alertCondition,
+      targetPrice: price,
+    });
     addAlert(alert);
     this.setData({ showAlertSheet: false });
     this._loadAlerts();
@@ -175,7 +226,8 @@ Page({
   onAbout() {
     wx.showModal({
       title: "关于 ZAN GOLD",
-      content: "金攒攒 - 贵金属投资管理工具\n\n实时追踪金银铂钯价格\n多笔持仓管理与盈亏计算\n数据云同步\n价格预警通知\n\nVersion 2.0",
+      content:
+        "金攒攒 - 贵金属投资管理工具\n\n实时追踪金银铂钯价格\n多笔持仓管理与盈亏计算\n数据云同步\n价格预警通知\n\nVersion 1.0.0",
       showCancel: false,
     });
   },

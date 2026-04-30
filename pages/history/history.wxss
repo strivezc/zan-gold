@@ -1,7 +1,7 @@
 .container {
   min-height: 100vh;
   padding: 24rpx 32rpx;
-  padding-bottom: calc(24rpx + 120rpx);
+  padding-bottom: 0;
   background: var(--bg-color);
 }
 
@@ -133,4 +133,9 @@
   display: block;
   margin-top: 8rpx;
   padding: 0 60rpx;
+}
+
+/* 底部安全间距(避免TabBar遮挡) */
+.tabbar-safe-bottom {
+  height: calc(180rpx + env(safe-area-inset-bottom));
 }

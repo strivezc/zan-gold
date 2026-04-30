@@ -33,10 +33,13 @@ Page({
     allTxs.sort((a, b) => b.createdAt - a.createdAt);
 
     const pnlSummary = getRealizedPnlSummary();
+    const fmt2 = (n) => (n || 0).toFixed(2);
 
     this.setData({
       transactions: allTxs,
       totalRealizedPnl: pnlSummary.grand,
+      _totalPnlStr: fmt2(pnlSummary.grand),
+      _pnlSign: pnlSummary.grand >= 0 ? "+" : "",
       pnlSummary,
     });
     this._applyFilter();
@@ -48,7 +51,17 @@ Page({
       filter === "all"
         ? transactions
         : transactions.filter((t) => t.type === filter);
-    this.setData({ filteredTransactions: filtered });
+
+    const formatted = filtered.map((t) => ({
+      ...t,
+      _weight: t.weight + "",
+      _price: t.pricePerGram ? t.pricePerGram.toFixed(2) : "--",
+      _pnl: t.realizedPnl !== null ? (t.realizedPnl >= 0 ? "+" : "") + t.realizedPnl.toFixed(2) : "",
+      _date: t.date + (t.note ? " · " + t.note : ""),
+      _metal: METAL_NAMES[t.metal] || t.metal,
+    }));
+
+    this.setData({ filteredTransactions: formatted });
   },
 
   onFilterChange(e) {

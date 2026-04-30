@@ -9,21 +9,19 @@ const METAL_NAMES = {
 };
 
 exports.main = async (event) => {
-  const { openid, alertData } = event;
+  const { alertData } = event;
+  const { OPENID: openid } = cloud.getWXContext();
 
   try {
     await cloud.openapi.subscribeMessage.send({
       touser: openid,
       page: "pages/market/market",
-      templateId: event.templateId || "YOUR_TEMPLATE_ID",
+      templateId: event.templateId || "Bhm52obkft_ObqRpVlt552bCRo9-0nen3g_Ut5moFYo",
       data: {
-        thing1: { value: METAL_NAMES[alertData.metal] || alertData.metal },
-        number2: { value: alertData.currentPrice.toFixed(2) },
-        thing3: {
-          value: `${alertData.condition === "above" ? "高于" : "低于"} ¥${alertData.targetPrice}/克`,
-        },
+        short_thing5: { value: METAL_NAMES[alertData.metal] + "预警" },
+        amount6: { value: alertData.currentPrice.toFixed(2) },
         time4: {
-          value: new Date().toLocaleString("zh-CN", { hour12: false }),
+          value: new Date().toLocaleString("zh-CN", { hour12: false, timeZone: "Asia/Shanghai" }),
         },
       },
     });

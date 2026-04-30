@@ -33,6 +33,9 @@
         <text class="alert-condition">
           {{item.condition === 'above' ? '高于' : '低于'}} ¥{{item.targetPrice}}/g
         </text>
+        <text class="alert-status {{item.lastTriggeredAt ? 'triggered' : 'pending'}}">
+          {{item._status}}
+        </text>
       </view>
       <view class="alert-actions">
         <switch class="alert-switch" checked="{{item.enabled}}" data-id="{{item.id}}" bindchange="onToggleAlert" color="#ff9500" />
@@ -115,4 +118,7 @@
     </view>
     <view class="sheet-btn" bindtap="onConfirmAlert">保存预警</view>
   </view>
+
+  <!-- 底部安全间距 -->
+  <view class="tabbar-safe-bottom"></view>
 </view>

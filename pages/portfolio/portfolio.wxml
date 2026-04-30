@@ -3,21 +3,21 @@
   <view class="summary-cards" wx:if="{{summary}}">
     <view class="sum-card gold-bg">
       <text class="sum-label">Au 黄金</text>
-      <text class="sum-value">¥{{summary.gold.totalValue ? summary.gold.totalValue.toFixed(2) : '0.00'}}</text>
+      <text class="sum-value">¥{{summary.gold._value}}</text>
       <view class="sum-meta">
-        <text>{{summary.gold.weight.toFixed(2)}}g</text>
+        <text>{{summary.gold._weight}}g</text>
         <text class="sum-pnl {{summary.gold.pnl >= 0 ? 'up' : 'down'}}">
-          {{summary.gold.pnl >= 0 ? '+' : ''}}{{summary.gold.pnlRate.toFixed(2)}}%
+          {{summary.gold._pnlRate}}%
         </text>
       </view>
     </view>
     <view class="sum-card silver-bg">
       <text class="sum-label">Ag 白银</text>
-      <text class="sum-value">¥{{summary.silver.totalValue ? summary.silver.totalValue.toFixed(2) : '0.00'}}</text>
+      <text class="sum-value">¥{{summary.silver._value}}</text>
       <view class="sum-meta">
-        <text>{{summary.silver.weight.toFixed(2)}}g</text>
+        <text>{{summary.silver._weight}}g</text>
         <text class="sum-pnl {{summary.silver.pnl >= 0 ? 'up' : 'down'}}">
-          {{summary.silver.pnl >= 0 ? '+' : ''}}{{summary.silver.pnlRate.toFixed(2)}}%
+          {{summary.silver._pnlRate}}%
         </text>
       </view>
     </view>
@@ -27,21 +27,21 @@
   <view class="summary-cards secondary" wx:if="{{summary.platinum.weight > 0 || summary.palladium.weight > 0}}">
     <view class="sum-card platinum-bg" wx:if="{{summary.platinum.weight > 0}}">
       <text class="sum-label">Pt 铂金</text>
-      <text class="sum-value">¥{{summary.platinum.totalValue.toFixed(2)}}</text>
+      <text class="sum-value">¥{{summary.platinum._value}}</text>
       <view class="sum-meta">
-        <text>{{summary.platinum.weight.toFixed(2)}}g</text>
+        <text>{{summary.platinum._weight}}g</text>
         <text class="sum-pnl {{summary.platinum.pnl >= 0 ? 'up' : 'down'}}">
-          {{summary.platinum.pnl >= 0 ? '+' : ''}}{{summary.platinum.pnlRate.toFixed(2)}}%
+          {{summary.platinum._pnlRate}}%
         </text>
       </view>
     </view>
     <view class="sum-card palladium-bg" wx:if="{{summary.palladium.weight > 0}}">
       <text class="sum-label">Pd 钯金</text>
-      <text class="sum-value">¥{{summary.palladium.totalValue.toFixed(2)}}</text>
+      <text class="sum-value">¥{{summary.palladium._value}}</text>
       <view class="sum-meta">
-        <text>{{summary.palladium.weight.toFixed(2)}}g</text>
+        <text>{{summary.palladium._weight}}g</text>
         <text class="sum-pnl {{summary.palladium.pnl >= 0 ? 'up' : 'down'}}">
-          {{summary.palladium.pnl >= 0 ? '+' : ''}}{{summary.palladium.pnlRate.toFixed(2)}}%
+          {{summary.palladium._pnlRate}}%
         </text>
       </view>
     </view>
@@ -50,10 +50,10 @@
   <!-- 总计 -->
   <view class="grand-total" wx:if="{{summary}}">
     <text class="gt-label">资产总净值</text>
-    <text class="gt-value">¥{{summary.grandTotal.toFixed(2)}}</text>
+    <text class="gt-value">¥{{summary._grandTotal}}</text>
     <view class="gt-pnl {{summary.totalPnl >= 0 ? 'up' : 'down'}}" wx:if="{{positions.length > 0}}">
       <text>{{summary.totalPnl >= 0 ? '▲' : '▼'}}</text>
-      <text> 累计盈亏: {{summary.totalPnl >= 0 ? '+' : ''}}{{summary.totalPnl.toFixed(2)}} 元</text>
+      <text> 累计盈亏: {{summary._totalPnl}} 元</text>
     </view>
     <view class="share-btn" bindtap="onSharePortfolio">
       <text>分享持仓</text>
@@ -73,8 +73,8 @@
       </view>
       <view class="pos-center">
         <text class="pos-metal">{{metalNames[item.metal]}}</text>
-        <text class="pos-detail">{{item.weight}}g · 均价 ¥{{item.pricePerGram ? item.pricePerGram.toFixed(2) : '--'}}</text>
-        <text class="pos-date">{{item.date}}{{item.note ? ' · ' + item.note : ''}}</text>
+        <text class="pos-detail">{{item._weight}}g · 均价 ¥{{item._price}}</text>
+        <text class="pos-date">{{item._date}}</text>
       </view>
       <view class="pos-actions">
         <view class="pos-action sell" bindtap="onShowSellSheet" data-metal="{{item.metal}}">
@@ -144,7 +144,7 @@
     <view class="form-group">
       <view class="form-row">
         <text class="form-label">可卖克数</text>
-        <text class="form-value">{{sellAvailable.toFixed(2)}}g</text>
+        <text class="form-value">{{sellAvailableStr}}g</text>
       </view>
       <view class="form-row">
         <text class="form-label">卖出克数</text>
@@ -157,4 +157,7 @@
     </view>
     <view class="sheet-btn sell-btn" bindtap="onConfirmSell">确认卖出</view>
   </view>
+
+  <!-- 底部安全间距 -->
+  <view class="tabbar-safe-bottom"></view>
 </view>

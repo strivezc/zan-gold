@@ -113,6 +113,7 @@ Page({
       const alerts = getAlerts();
       const triggered = checkAlerts(alerts, data);
       if (triggered.length > 0) {
+        console.log("[alert] 触发预警:", triggered.map(a => `${a.metal} ${a.condition} ${a.targetPrice}`));
         handleTriggeredAlerts(triggered);
       }
     } catch (err) {

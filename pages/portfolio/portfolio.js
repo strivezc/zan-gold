@@ -56,8 +56,30 @@ Page({
   _loadData() {
     const positions = getPositions();
     const prices = app.globalData.prices || {};
-    const summary = calcPortfolioSummary(positions, prices);
-    this.setData({ positions, summary });
+    const raw = calcPortfolioSummary(positions, prices);
+
+    // WXML不支持调用JS方法(如toFixed)，需要预格式化
+    const fmt2 = (n) => (n || 0).toFixed(2);
+    const fmtPnl = (n) => (n >= 0 ? "+" : "") + (n || 0).toFixed(2);
+    const summary = {
+      gold: { ...raw.gold, _value: fmt2(raw.gold.totalValue), _weight: fmt2(raw.gold.weight), _pnl: fmtPnl(raw.gold.pnl), _pnlRate: fmt2(raw.gold.pnlRate) },
+      silver: { ...raw.silver, _value: fmt2(raw.silver.totalValue), _weight: fmt2(raw.silver.weight), _pnl: fmtPnl(raw.silver.pnl), _pnlRate: fmt2(raw.silver.pnlRate) },
+      platinum: { ...raw.platinum, _value: fmt2(raw.platinum.totalValue), _weight: fmt2(raw.platinum.weight), _pnl: fmtPnl(raw.platinum.pnl), _pnlRate: fmt2(raw.platinum.pnlRate) },
+      palladium: { ...raw.palladium, _value: fmt2(raw.palladium.totalValue), _weight: fmt2(raw.palladium.weight), _pnl: fmtPnl(raw.palladium.pnl), _pnlRate: fmt2(raw.palladium.pnlRate) },
+      grandTotal: raw.grandTotal,
+      _grandTotal: fmt2(raw.grandTotal),
+      totalPnl: raw.totalPnl,
+      _totalPnl: fmtPnl(raw.totalPnl),
+    };
+
+    const formatted = positions.map((p) => ({
+      ...p,
+      _weight: p.weight + "",
+      _price: p.pricePerGram ? p.pricePerGram.toFixed(2) : "--",
+      _date: p.date + (p.note ? " · " + p.note : ""),
+    }));
+
+    this.setData({ positions: formatted, summary });
   },
 
   _getDefaultPrice(metal) {
@@ -130,6 +152,7 @@ Page({
       sellWeight: "",
       sellPrice: prices[metal] ? prices[metal].price_g : "",
       sellAvailable: metalData ? metalData.weight : 0,
+      sellAvailableStr: metalData ? metalData.weight.toFixed(2) : "0.00",
     });
   },
 

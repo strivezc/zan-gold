@@ -51,7 +51,7 @@ function checkAlerts(alerts, prices) {
 function requestAlertPermission() {
   return new Promise((resolve) => {
     wx.requestSubscribeMessage({
-      tmplIds: ["YOUR_TEMPLATE_ID"], // 需替换为实际模板ID
+      tmplIds: ["Bhm52obkft_ObqRpVlt552bCRo9-0nen3g_Ut5moFYo"], // 需替换为实际模板ID
       success: () => resolve(true),
       fail: () => resolve(false),
     });
@@ -59,17 +59,17 @@ function requestAlertPermission() {
 }
 
 /**
- * 处理触发的预警(发送通知 + 更新触发时间)
+ * 处理触发的预警 — 直接发送通知(权限在添加预警时已获取)
  * @param {Array} triggeredAlerts
  */
 async function handleTriggeredAlerts(triggeredAlerts) {
   for (const alert of triggeredAlerts) {
-    // 更新触发时间
+    // 标记已触发(避免重复提醒)
     updateAlert(alert.id, { lastTriggeredAt: Date.now() });
 
-    // 调用云函数发送通知
+    // 直接调用云函数发送通知(无需用户交互，权限已在添加时获取)
     try {
-      await wx.cloud.callFunction({
+      const res = await wx.cloud.callFunction({
         name: "sendAlert",
         data: {
           alertData: {
@@ -78,11 +78,12 @@ async function handleTriggeredAlerts(triggeredAlerts) {
             condition: alert.condition,
             targetPrice: alert.targetPrice,
           },
-          templateId: "YOUR_TEMPLATE_ID",
+          templateId: "Bhm52obkft_ObqRpVlt552bCRo9-0nen3g_Ut5moFYo",
         },
       });
+      console.log("[alert] 通知发送成功:", res.result);
     } catch (err) {
-      console.error("发送预警通知失败:", err);
+      console.error("[alert] 通知发送失败:", err);
     }
   }
 }

@@ -1,6 +1,7 @@
 .container {
   min-height: 100vh;
   padding: 0 32rpx;
+  padding-bottom: 0;
   display: flex;
   flex-direction: column;
   background: var(--bg-color);
@@ -193,7 +194,7 @@
   padding: 24rpx;
   margin-bottom: 24rpx;
   box-shadow: 0 8rpx 22rpx rgba(0, 0, 0, 0.05);
-  padding-bottom: calc(24rpx + 120rpx);
+  padding-bottom: 24rpx;
 }
 .converter-title-row {
   display: flex;
@@ -279,4 +280,10 @@
 }
 .dark .divider {
   background: rgba(255, 255, 255, 0.1);
+}
+
+/* 底部安全间距(避免TabBar遮挡) */
+.tabbar-safe-bottom {
+  height: calc(180rpx + env(safe-area-inset-bottom));
+  flex-shrink: 0;
 }

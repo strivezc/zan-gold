@@ -78,4 +78,7 @@
       <text class="converter-result-value">{{domesticGoldResult}} 元/克</text>
     </view>
   </view>
+
+  <!-- 底部安全间距 -->
+  <view class="tabbar-safe-bottom"></view>
 </view>

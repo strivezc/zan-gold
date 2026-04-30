@@ -25,11 +25,14 @@ App({
     if (!wx.cloud) return;
 
     try {
-      wx.cloud.init({ env: "zan-gold-prod", traceUser: true });
+      wx.cloud.init({ env: "cloud1-d7gj7xio9ed11b22a", traceUser: true });
       this.globalData.cloudReady = true;
 
-      // 拉取云端数据并合并
-      const cloudData = await cloudService.syncFromCloud();
+      // 拉取云端数据并合并(带超时保护)
+      const cloudData = await Promise.race([
+        cloudService.syncFromCloud(),
+        new Promise((_, reject) => setTimeout(() => reject(new Error("cloud timeout")), 8000)),
+      ]);
       if (cloudData) {
         const localData = {
           positions: storage.getPositions(),
@@ -65,7 +68,8 @@ App({
         });
       };
     } catch (err) {
-      console.error("云初始化失败:", err);
+      console.warn("云同步跳过:", err.message || err);
+      this.globalData.cloudReady = false;
     }
   },
 

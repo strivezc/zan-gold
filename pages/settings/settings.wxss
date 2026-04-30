@@ -1,7 +1,7 @@
 .container {
   min-height: 100vh;
   padding: 24rpx 32rpx;
-  padding-bottom: calc(24rpx + 120rpx);
+  padding-bottom: 0;
   background: var(--bg-color);
 }
 
@@ -88,6 +88,13 @@
   display: block;
   margin-top: 4rpx;
 }
+.alert-status {
+  font-size: 20rpx;
+  display: block;
+  margin-top: 4rpx;
+}
+.alert-status.pending { color: var(--text-sub); }
+.alert-status.triggered { color: #34c759; }
 .alert-actions {
   display: flex;
   align-items: center;
@@ -170,7 +177,7 @@
   position: fixed;
   top: 0; left: 0; right: 0; bottom: 0;
   background: rgba(0, 0, 0, 0.4);
-  z-index: 200;
+  z-index: 1000;
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.3s;
@@ -183,8 +190,8 @@
   background: var(--card-white);
   border-radius: 40rpx 40rpx 0 0;
   padding: 32rpx;
-  padding-bottom: calc(32rpx + env(safe-area-inset-bottom));
-  z-index: 201;
+  padding-bottom: calc(32rpx + 120rpx + env(safe-area-inset-bottom));
+  z-index: 1001;
   transform: translateY(100%);
   transition: transform 0.3s ease;
 }
@@ -207,7 +214,7 @@
   font-weight: 600;
 }
 
-.form-group { margin-bottom: 32rpx; }
+.form-group { margin-bottom: 32rpx; max-height: 60vh; overflow-y: auto; }
 .form-row {
   display: flex;
   justify-content: space-between;
@@ -244,3 +251,8 @@
   border-radius: 24rpx;
 }
 .sheet-btn:active { opacity: 0.8; }
+
+/* 底部安全间距(避免TabBar遮挡) */
+.tabbar-safe-bottom {
+  height: calc(180rpx + env(safe-area-inset-bottom));
+}
