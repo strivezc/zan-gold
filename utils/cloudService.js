@@ -39,10 +39,15 @@ async function syncFromCloud() {
 /**
  * 推送数据到云端(防抖)
  * @param {object} payload - { positions, transactions, alerts, settings }
+ * @param {boolean} immediate - 是否立即同步(不走防抖)
  */
-function syncToCloud(payload) {
+function syncToCloud(payload, immediate) {
   if (_syncTimer) clearTimeout(_syncTimer);
-  _syncTimer = setTimeout(() => _doSync(payload), 2000);
+  if (immediate) {
+    _doSync(payload);
+  } else {
+    _syncTimer = setTimeout(() => _doSync(payload), 2000);
+  }
 }
 
 async function _doSync(payload) {
@@ -80,27 +85,27 @@ function mergeData(local, cloud) {
   if (!cloud) return local;
   if (!local) return cloud;
 
-  // 按 updatedAt 决定整体偏好
-  const cloudIsNewer = (cloud.updatedAt || 0) > (local.updatedAt || 0);
+  const localTime = local.updatedAt || 0;
+  const cloudTime = cloud.updatedAt || 0;
+  const localIsEmpty = (local.positions || []).length === 0 && (local.transactions || []).length === 0;
+  const cloudIsNewer = cloudTime > localTime;
 
-  // positions 和 transactions 按 id 去重合并
-  const mergedPositions = _mergeArraysById(
-    local.positions || [],
-    cloud.positions || [],
-    cloudIsNewer,
-  );
-  const mergedTransactions = _mergeArraysById(
-    local.transactions || [],
-    cloud.transactions || [],
-    cloudIsNewer,
-  );
+  // 本地为空(新安装) → 用云端数据
+  if (localIsEmpty) return cloud;
+
+  // 本地更新 → 以本地为准(删除操作不会被云端覆盖)
+  if (!cloudIsNewer) return local;
+
+  // 云端更新 → 合并双方(按id去重，云端优先)
+  const mergedPositions = _mergeArraysById(local.positions || [], cloud.positions || [], true);
+  const mergedTransactions = _mergeArraysById(local.transactions || [], cloud.transactions || [], true);
 
   return {
     positions: mergedPositions,
     transactions: mergedTransactions,
-    alerts: cloudIsNewer ? (cloud.alerts || local.alerts || []) : (local.alerts || cloud.alerts || []),
-    settings: cloudIsNewer ? (cloud.settings || local.settings || {}) : (local.settings || cloud.settings || {}),
-    updatedAt: Math.max(local.updatedAt || 0, cloud.updatedAt || 0),
+    alerts: cloud.alerts || local.alerts || [],
+    settings: cloud.settings || local.settings || {},
+    updatedAt: cloudTime,
   };
 }
 
@@ -110,10 +115,12 @@ function _mergeArraysById(localArr, cloudArr, preferCloud) {
   localArr.forEach((item) => {
     map[item.id] = item;
   });
-  // 再放云端(如果偏好云端则覆盖，否则保留本地)
+  // 云端数据：只在偏好云端时合并(本地更新时，云端多出的条目视为已删除)
   cloudArr.forEach((item) => {
-    if (!map[item.id] || preferCloud) {
+    if (preferCloud) {
       map[item.id] = item;
+    } else if (map[item.id]) {
+      // 本地更新，保留本地版本(不添加云端多出的条目)
     }
   });
   return Object.values(map);

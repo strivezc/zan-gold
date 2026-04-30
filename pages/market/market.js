@@ -41,7 +41,7 @@ Page({
     this.setData({ isDark: app.globalData.isDark || false });
     // 更新tabBar激活状态
     if (typeof this.getTabBar === "function" && this.getTabBar()) {
-      this.getTabBar().setData({ active: 0 });
+      this.getTabBar().setData({ active: 0, isDark: this.data.isDark });
     }
     if (!this._interval) {
       this.refreshPrices();

@@ -20,7 +20,7 @@ const METAL_NAMES = {
 
 Page({
   data: {
-    themeMode: "system",
+    themeMode: "light",
     isDark: false,
     historyDataSize: "--",
     alerts: [],
@@ -34,7 +34,7 @@ Page({
   onShow() {
     this.setData({ isDark: app.globalData.isDark || false });
     if (typeof this.getTabBar === "function" && this.getTabBar()) {
-      this.getTabBar().setData({ active: 3 });
+      this.getTabBar().setData({ active: 3, isDark: this.data.isDark });
     }
     this._loadSettings();
     this._calcHistorySize();
@@ -43,7 +43,7 @@ Page({
 
   _loadSettings() {
     const settings = getSettings();
-    this.setData({ themeMode: settings.themeMode || "system" });
+    this.setData({ themeMode: settings.themeMode || "light" });
   },
 
   _loadAlerts() {

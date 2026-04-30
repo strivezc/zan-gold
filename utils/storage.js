@@ -86,7 +86,7 @@ function updateAlert(id, changes) {
 // ========== 设置 ==========
 
 function getSettings() {
-  return wx.getStorageSync(SETTINGS_KEY) || { themeMode: "system" };
+  return wx.getStorageSync(SETTINGS_KEY) || { themeMode: "light" };
 }
 
 function saveSettings(settings) {
@@ -104,6 +104,9 @@ function setCloudService(service) {
 }
 
 function _notifyChange() {
+  // 立即记录时间戳(确保合并时本地数据不会被云端覆盖)
+  wx.setStorageSync("localUpdatedAt", Date.now());
+  // 云同步走防抖
   if (!_cloudService) return;
   if (_changeTimer) clearTimeout(_changeTimer);
   _changeTimer = setTimeout(() => {

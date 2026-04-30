@@ -1,4 +1,4 @@
-import { getPositions, deletePosition } from "../../utils/storage";
+import { getPositions, deletePosition, updatePosition } from "../../utils/storage";
 import { calcPortfolioSummary } from "../../utils/calculator";
 import { genId, todayStr } from "../../utils/formatter";
 import { addBuyTransaction, addSellTransaction } from "../../utils/transactionService";
@@ -33,6 +33,15 @@ Page({
     newWeight: "",
     newNote: "",
 
+    // 编辑Sheet
+    showEditSheet: false,
+    editId: "",
+    editMetal: "gold",
+    editDate: "",
+    editPrice: "",
+    editWeight: "",
+    editNote: "",
+
     // 卖出Sheet
     showSellSheet: false,
     sellMetal: "",
@@ -48,7 +57,7 @@ Page({
   onShow() {
     this.setData({ isDark: app.globalData.isDark || false });
     if (typeof this.getTabBar === "function" && this.getTabBar()) {
-      this.getTabBar().setData({ active: 1 });
+      this.getTabBar().setData({ active: 1, isDark: this.data.isDark });
     }
     this._loadData();
   },
@@ -136,6 +145,55 @@ Page({
     this.setData({ showAddSheet: false });
     this._loadData();
     wx.showToast({ title: "买入成功", icon: "success" });
+  },
+
+  // ========== 编辑持仓 ==========
+
+  onShowEditSheet(e) {
+    const id = e.currentTarget.dataset.id;
+    const pos = getPositions().find((p) => p.id === id);
+    if (!pos) return;
+    this.setData({
+      showEditSheet: true,
+      editId: pos.id,
+      editMetal: pos.metal,
+      editDate: pos.date,
+      editPrice: pos.pricePerGram ? pos.pricePerGram + "" : "",
+      editWeight: pos.weight + "",
+      editNote: pos.note || "",
+    });
+  },
+
+  onHideEditSheet() {
+    this.setData({ showEditSheet: false });
+  },
+
+  onEditMetalChange(e) {
+    const metals = ["gold", "silver", "platinum", "palladium"];
+    this.setData({ editMetal: metals[e.detail.value] });
+  },
+  onEditDateChange(e) { this.setData({ editDate: e.detail.value }); },
+  onEditPriceInput(e) { this.setData({ editPrice: e.detail.value }); },
+  onEditWeightInput(e) { this.setData({ editWeight: e.detail.value }); },
+  onEditNoteInput(e) { this.setData({ editNote: e.detail.value }); },
+
+  onConfirmEdit() {
+    const { editId, editMetal, editDate, editPrice, editWeight, editNote } = this.data;
+    const weight = parseFloat(editWeight);
+    if (!weight || weight <= 0) {
+      wx.showToast({ title: "请输入克数", icon: "none" });
+      return;
+    }
+    updatePosition(editId, {
+      metal: editMetal,
+      date: editDate,
+      pricePerGram: editPrice ? parseFloat(editPrice) : 0,
+      weight,
+      note: editNote || "",
+    });
+    this.setData({ showEditSheet: false });
+    this._loadData();
+    wx.showToast({ title: "已更新", icon: "success" });
   },
 
   // ========== 卖出 ==========

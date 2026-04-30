@@ -56,6 +56,10 @@
   font-size: 40rpx;
   margin-bottom: 8rpx;
 }
+.dark .theme-icon {
+  color: #ffffff;
+  text-shadow: 0 0 4rpx rgba(255, 255, 255, 0.5);
+}
 .theme-label {
   font-size: 22rpx;
   font-weight: 600;
@@ -149,6 +153,10 @@
 .item-icon {
   font-size: 36rpx;
   margin-right: 20rpx;
+}
+.dark .item-icon {
+  color: #ffffff;
+  text-shadow: 0 0 4rpx rgba(255, 255, 255, 0.5);
 }
 .item-info {}
 .item-title {

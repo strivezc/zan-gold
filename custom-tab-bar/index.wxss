@@ -15,10 +15,17 @@
   z-index: 999;
 }
 
-page.dark .tab-bar {
-  background: rgba(28, 28, 30, 0.85);
-  border-top-color: rgba(255, 255, 255, 0.06);
+/* 深色模式 */
+.tab-bar.dark {
+  background: rgba(28, 28, 30, 0.95) !important;
+  border-top-color: rgba(255, 255, 255, 0.1);
 }
+.tab-bar.dark .tab-icon {
+  opacity: 1;
+  color: #ffffff;
+  text-shadow: 0 0 4rpx rgba(255, 255, 255, 0.5);
+}
+.tab-bar.dark .tab-label { color: #e5e5ea; }
 
 .tab-item {
   display: flex;
@@ -46,10 +53,6 @@ page.dark .tab-bar {
   font-weight: 600;
   color: #86868b;
   transition: color 0.2s;
-}
-
-page.dark .tab-label {
-  color: #98989d;
 }
 
 .tab-item.active .tab-label {

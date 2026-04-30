@@ -11,7 +11,7 @@ App({
 
     // 初始化主题
     const settings = getSettings();
-    this.applyTheme(settings.themeMode || "system");
+    this.applyTheme(settings.themeMode || "light");
 
     // 接入云同步
     setCloudService(cloudService);
@@ -39,7 +39,7 @@ App({
           transactions: storage.getTransactions(),
           alerts: storage.getAlerts(),
           settings: storage.getSettings(),
-          updatedAt: 0,
+          updatedAt: wx.getStorageSync("localUpdatedAt") || 0,
         };
         const merged = cloudService.mergeData(localData, cloudData);
 
@@ -60,11 +60,14 @@ App({
 
       // 注册数据变更回调
       cloudService.onDataChanged = () => {
+        const now = Date.now();
+        wx.setStorageSync("localUpdatedAt", now);
         cloudService.syncToCloud({
           positions: storage.getPositions(),
           transactions: storage.getTransactions(),
           alerts: storage.getAlerts(),
           settings: storage.getSettings(),
+          updatedAt: now,
         });
       };
     } catch (err) {
@@ -74,14 +77,17 @@ App({
   },
 
   onHide() {
-    // 页面隐藏时立即同步
+    // 页面隐藏时立即同步(不走防抖)
     if (this.globalData.cloudReady) {
+      const now = Date.now();
+      wx.setStorageSync("localUpdatedAt", now);
       cloudService.syncToCloud({
         positions: storage.getPositions(),
         transactions: storage.getTransactions(),
         alerts: storage.getAlerts(),
         settings: storage.getSettings(),
-      });
+        updatedAt: now,
+      }, true);
     }
   },
 
@@ -90,25 +96,19 @@ App({
    * @param {string} mode - "system" | "light" | "dark"
    */
   applyTheme(mode) {
-    let isDark = false;
-    if (mode === "dark") {
-      isDark = true;
-    } else if (mode === "system") {
-      try {
-        const info = wx.getSystemInfoSync();
-        isDark = info.theme === "dark";
-      } catch (e) {
-        isDark = false;
-      }
-    }
+    const isDark = mode === "dark";
     this.globalData.isDark = isDark;
+    this._notifyThemeChange(isDark);
+  },
 
-    // 监听系统主题变化
-    if (mode === "system" && wx.onThemeChange) {
-      wx.onThemeChange((res) => {
-        this.globalData.isDark = res.theme === "dark";
-      });
-    }
+  _notifyThemeChange(isDark) {
+    const pages = getCurrentPages();
+    pages.forEach((p) => {
+      if (p.setData) p.setData({ isDark });
+      if (typeof p.getTabBar === "function" && p.getTabBar()) {
+        p.getTabBar().setData({ isDark });
+      }
+    });
   },
 
   globalData: {

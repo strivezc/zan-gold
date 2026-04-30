@@ -23,7 +23,7 @@ Page({
   onShow() {
     this.setData({ isDark: app.globalData.isDark || false });
     if (typeof this.getTabBar === "function" && this.getTabBar()) {
-      this.getTabBar().setData({ active: 2 });
+      this.getTabBar().setData({ active: 2, isDark: this.data.isDark });
     }
     this._loadData();
   },

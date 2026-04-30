@@ -22,13 +22,12 @@ page {
   --shadow-card: 0 10rpx 30rpx rgba(0, 0, 0, 0.05);
   --bg-subtle: rgba(0, 0, 0, 0.03);
 
-  background-color: var(--bg-color);
+  background-color: #f5f6f7;
   color: var(--text-main);
   font-family: -apple-system, "SF Pro Text", "Helvetica Neue", sans-serif;
 }
 
-/* 暗黑模式变量覆盖 */
-page.dark,
+/* 深色模式 */
 .dark {
   --bg-color: #000000;
   --card-white: #1c1c1e;
@@ -47,4 +46,8 @@ page.dark,
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
+  background-color: #f5f6f7;
+}
+.dark.container {
+  background-color: #000000;
 }

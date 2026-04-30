@@ -3,10 +3,6 @@
   <view class="section">
     <text class="section-title">外观</text>
     <view class="theme-picker">
-      <view class="theme-option {{themeMode === 'system' ? 'active' : ''}}" data-mode="system" bindtap="onThemeChange">
-        <text class="theme-icon">🔄</text>
-        <text class="theme-label">跟随系统</text>
-      </view>
       <view class="theme-option {{themeMode === 'light' ? 'active' : ''}}" data-mode="light" bindtap="onThemeChange">
         <text class="theme-icon">☀</text>
         <text class="theme-label">浅色</text>
@@ -84,7 +80,7 @@
         <text class="item-icon">💛</text>
         <view class="item-info">
           <text class="item-title">关于 ZAN GOLD</text>
-          <text class="item-desc">Version 2.0</text>
+          <text class="item-desc">Version 1.0</text>
         </view>
       </view>
       <text class="item-arrow">›</text>

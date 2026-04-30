@@ -77,6 +77,9 @@
         <text class="pos-date">{{item._date}}</text>
       </view>
       <view class="pos-actions">
+        <view class="pos-action edit" bindtap="onShowEditSheet" data-id="{{item.id}}">
+          <text>编辑</text>
+        </view>
         <view class="pos-action sell" bindtap="onShowSellSheet" data-metal="{{item.metal}}">
           <text>卖出</text>
         </view>
@@ -156,6 +159,42 @@
       </view>
     </view>
     <view class="sheet-btn sell-btn" bindtap="onConfirmSell">确认卖出</view>
+  </view>
+
+  <!-- 编辑持仓底Sheet -->
+  <view class="sheet-mask {{showEditSheet ? 'show' : ''}}" bindtap="onHideEditSheet"></view>
+  <view class="sheet {{showEditSheet ? 'show' : ''}}">
+    <view class="sheet-header">
+      <text class="sheet-title">编辑持仓</text>
+      <text class="sheet-close" bindtap="onHideEditSheet">取消</text>
+    </view>
+    <view class="form-group">
+      <view class="form-row">
+        <text class="form-label">金属类型</text>
+        <picker range="{{['黄金', '白银', '铂金', '钯金']}}" bindchange="onEditMetalChange">
+          <text class="form-value">{{metalNames[editMetal]}} ▾</text>
+        </picker>
+      </view>
+      <view class="form-row">
+        <text class="form-label">买入日期</text>
+        <picker mode="date" value="{{editDate}}" bindchange="onEditDateChange">
+          <text class="form-value">{{editDate}} ▾</text>
+        </picker>
+      </view>
+      <view class="form-row">
+        <text class="form-label">买入均价 (元/g)</text>
+        <input class="form-input" type="digit" value="{{editPrice}}" bindinput="onEditPriceInput" placeholder="输入买入价格" />
+      </view>
+      <view class="form-row">
+        <text class="form-label">持有克数</text>
+        <input class="form-input" type="digit" value="{{editWeight}}" bindinput="onEditWeightInput" placeholder="输入克数" />
+      </view>
+      <view class="form-row">
+        <text class="form-label">备注 (可选)</text>
+        <input class="form-input" value="{{editNote}}" bindinput="onEditNoteInput" placeholder="如: 春节购入" />
+      </view>
+    </view>
+    <view class="sheet-btn" bindtap="onConfirmEdit">保存修改</view>
   </view>
 
   <!-- 底部安全间距 -->
